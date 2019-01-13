@@ -4,6 +4,15 @@
 //
 //=============================================================================
 
+//======= Point and Teleport movement ===============
+//
+// Allows teleportation around game space by pressing down the touchpad
+// and aiming at a teleportation surface. Upon letting go player is 
+// teleported to the new position instantly
+//
+//=============================================================================
+
+
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
@@ -231,7 +240,7 @@ namespace Valve.VR.InteractionSystem
 		}
 
 
-		//-------------------------------------------------
+		//--------------------------------------------------
 		void Update()
 		{
 			Hand oldPointerHand = pointerHand;
@@ -245,7 +254,7 @@ namespace Valve.VR.InteractionSystem
 					{
 						if ( pointerHand == hand ) //This is the pointer hand
 						{
-							TryTeleportPlayer();
+                            TryTeleportPlayer();
 						}
 					}
 				}
@@ -254,7 +263,7 @@ namespace Valve.VR.InteractionSystem
 				{
 					newPointerHand = hand;
 				}
-			}
+            }
 
 			//If something is attached to the hand that is preventing teleport
 			if ( allowTeleportWhileAttached && !allowTeleportWhileAttached.teleportAllowed )
@@ -1153,5 +1162,6 @@ namespace Valve.VR.InteractionSystem
 				return hand.transform;
 			}
 		}
-	}
+    }
 }
+

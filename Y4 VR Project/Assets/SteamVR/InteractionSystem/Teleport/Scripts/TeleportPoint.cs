@@ -126,7 +126,7 @@ namespace Valve.VR.InteractionSystem
 				}
 				else
 				{
-					SetMeshMaterials( Teleport.instance.pointVisibleMaterial, titleVisibleColor );
+					SetMeshMaterials(Teleport.instance.pointVisibleMaterial, titleVisibleColor );
 				}
 			}
 
@@ -153,7 +153,7 @@ namespace Valve.VR.InteractionSystem
 
 			if ( locked )
 			{
-				SetMeshMaterials( Teleport.instance.pointLockedMaterial, titleLockedColor );
+				SetMeshMaterials(Teleport.instance.pointLockedMaterial, titleLockedColor );
 
 				pointIcon = lockedIcon;
 
@@ -161,7 +161,7 @@ namespace Valve.VR.InteractionSystem
 			}
 			else
 			{
-				SetMeshMaterials( Teleport.instance.pointVisibleMaterial, titleVisibleColor );
+				SetMeshMaterials(Teleport.instance.pointVisibleMaterial, titleVisibleColor );
 
 				switch ( teleportType )
 				{

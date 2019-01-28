@@ -38,7 +38,6 @@ namespace Valve.VR.InteractionSystem
         public Color pointerLockedColor;
         public bool showPlayAreaMarker = true;
 
-        public float teleportFadeTime = 0.1f;
         public float meshFadeTime = 0.2f;
 
         public float arcDistance = 10.0f;
@@ -585,7 +584,6 @@ namespace Valve.VR.InteractionSystem
             else
             {
                 return teleportAction.GetState(hand.handType);
-                //return hand.controller.GetPress( SteamVR_Controller.ButtonMask.Touchpad );
             }
         }
 
@@ -605,7 +603,6 @@ namespace Valve.VR.InteractionSystem
             else
             {
                 return teleportAction.GetStateDown(hand.handType);
-                //return hand.controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad );
             }
         }
     }

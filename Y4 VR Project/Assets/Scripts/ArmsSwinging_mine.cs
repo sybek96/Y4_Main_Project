@@ -107,12 +107,12 @@ namespace Valve.VR.InteractionSystem
         private Vector3 hand1PosCur;
         private Vector3 hand2PosCur;
 
-        private float walkThresholdX = 0.4f;
-        private float walkThresholdY = 0.1f;
+        private float walkThreshold = 0.3f;
 
-        private float singleStep = 1.0f;
+        private float singleStep = 0.5f;
         private Vector3 destination;
         private bool doLerp = false;
+        private bool detectedStep = false;
 
         // Events
 
@@ -190,7 +190,7 @@ namespace Valve.VR.InteractionSystem
             }
 
             CheckForSpawnPoint();
-            destination = player.headCollider.transform.position;
+            destination = player.trackingOriginTransform.position;
 
         }
 
@@ -295,27 +295,6 @@ namespace Valve.VR.InteractionSystem
                 {
                     armSwingingActive = false;
                 }
-                //if (IsTeleportButtonDown(hand))
-                //{
-                //    if (!gotHeadingDirectionMWIL)
-                //    {
-                //        headingVecMWIL = player.bodyDirectionGuess.normalized;
-                //        headingVecMWIL.y = 0;
-                //    }
-                //    if (Mathf.Acos(Vector3.Dot(headingVecMWIL, player.bodyDirectionGuess)) > 0.5f)
-                //    {
-                //        headingVecMWIL = Vector3.RotateTowards(headingVecMWIL, player.bodyDirectionGuess, 0.2f, 1.0f);
-                //        headingVecMWIL.y = 0;
-                //    }
-
-                //    Vector3 newPos = player.trackingOriginTransform.position + (headingVecMWIL * 0.02f);
-                //    if ((newPos.x < 4.5 && newPos.x > -4.5) && (newPos.z < 4.5 && newPos.z > -4.5))
-                //    {
-                //        player.headCollider.transform.position = newPos;
-                //        player.trackingOriginTransform.position = player.headCollider.transform.position;
-                //    }
-                //    gotHeadingDirectionMWIL = true;
-                //}
             }
             if(armSwingingActive)
             {
@@ -323,13 +302,13 @@ namespace Valve.VR.InteractionSystem
                 hand1PosCur = player.hands[0].transform.position;
                 hand2PosCur = player.hands[1].transform.position;
 
-                //Debug.Log(player.hands[0].transform.position);
+
+                float distBetweenCurrentAndPreviousPosition1 = (hand1PosInitial - hand1PosCur).magnitude;
+                float distBetweenCurrentAndPreviousPosition2 = (hand2PosInitial - hand2PosCur).magnitude;
 
 
-
-                float distBetweenCurrentAndPreviousPosition = (hand1PosInitial - hand1PosCur).magnitude;
-
-                if (distBetweenCurrentAndPreviousPosition > walkThresholdX)
+                ///check magnitude of both hands has left their threshold
+                if (distBetweenCurrentAndPreviousPosition1 > walkThreshold && distBetweenCurrentAndPreviousPosition2 > walkThreshold && !doLerp)
                 {
                     Debug.Log("THRESHOLD PASSED");
                     Vector3 headingVec = player.bodyDirectionGuess.normalized;
@@ -340,30 +319,38 @@ namespace Valve.VR.InteractionSystem
 
                     if ((destination.x < 4.5 && destination.x > -4.5) && (destination.z < 4.5 && destination.z > -4.5))
                     {
-                        player.trackingOriginTransform.position = destination;
+                        //player.trackingOriginTransform.position = destination;
                         //must allow a single pass so hands are updated
-                        updateHandInit = true;
-                        //doLerp = true;
+                        //updateHandInit = true;
+                        detectedStep = true;
+                        doLerp = true;
+                    }
+                    else
+                    {
+                        destination -= player.trackingOriginTransform.position;
+                        doLerp = false;
                     }
 
 
                 }
-                //if ((player.trackingOriginTransform.position.x > destination.x + 0.0001f || player.trackingOriginTransform.position.x < destination.x - 0.0001f)
-                //    &&
-                //    (player.trackingOriginTransform.position.z > destination.z + 0.0001f || player.trackingOriginTransform.position.z < destination.z - 0.0001f))
-                //{
-                //    //    player.headCollider.transform.position = Vector3.Lerp(player.headCollider.transform.position, destination, 0.1f);
-
-                //    //    player.trackingOriginTransform.position = player.headCollider.transform.position;
-                //    player.trackingOriginTransform.position = Vector3.Lerp(player.trackingOriginTransform.position, destination, 0.1f);
-                //    player.headCollider.transform.position = player.trackingOriginTransform.position;
-                //}
-                //else if (doLerp)
-                //{
-                //    doLerp = false;
-                //    updateHandInit = true;
-
-                //}
+            }
+            //if destination point moves at any point, lerp player to the destination
+            if ((player.trackingOriginTransform.position.x > destination.x + 0.001f || player.trackingOriginTransform.position.x < destination.x - 0.001f)
+                &&
+                (player.trackingOriginTransform.position.z > destination.z + 0.001f || player.trackingOriginTransform.position.z < destination.z - 0.001f) && doLerp)
+            {
+                player.trackingOriginTransform.position = Vector3.Lerp(player.trackingOriginTransform.position, destination, 0.17f);
+            }
+            else //otherwise destination is the players current position
+            {
+                //if its the first loop AFTER the step is linearly interpolated, update initial hand position
+                if(detectedStep)
+                {
+                    updateHandInit = true;
+                    detectedStep = false;
+                }
+                destination = player.trackingOriginTransform.position;
+                doLerp = false;
             }
 
         }
